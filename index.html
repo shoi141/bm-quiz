@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ビジネスマネージャー検定 学習アプリ</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0f1e35;
+    --navy2: #172a4a;
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --cream: #f5f0e8;
+    --white: #ffffff;
+    --text: #1a1a2e;
+    --muted: #6b7280;
+    --correct: #16a34a;
+    --wrong: #dc2626;
+    --correct-bg: #f0fdf4;
+    --wrong-bg: #fef2f2;
+    --shadow: 0 4px 24px rgba(15,30,53,0.13);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ===== HEADER ===== */
+  header {
+    background: var(--navy);
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.3);
+    position: sticky; top: 0; z-index: 100;
+  }
+  header .logo {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.15rem;
+    color: var(--gold);
+    letter-spacing: 0.05em;
+    font-weight: 700;
+  }
+  header .sub {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+  }
+  header .spacer { flex: 1; }
+  header .score-badge {
+    background: rgba(201,168,76,0.15);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    display: none;
+  }
+
+  /* ===== SCREENS ===== */
+  .screen { display: none; animation: fadeUp 0.35s ease; }
+  .screen.active { display: block; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== HOME ===== */
+  #home {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+  .hero {
+    text-align: center;
+    margin-bottom: 44px;
+  }
+  .hero h1 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 2rem;
+    color: var(--navy);
+    margin-bottom: 10px;
+    line-height: 1.4;
+  }
+  .hero h1 span { color: var(--gold); }
+  .hero p {
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.8;
+  }
+
+  .section-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1rem;
+    color: var(--navy);
+    margin-bottom: 16px;
+    padding-left: 10px;
+    border-left: 3px solid var(--gold);
+  }
+
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
+    margin-bottom: 36px;
+  }
+
+  .cat-card {
+    background: var(--white);
+    border: 2px solid transparent;
+    border-radius: 12px;
+    padding: 20px 18px;
+    cursor: pointer;
+    transition: all 0.22s ease;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+  }
+  .cat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transition: transform 0.22s ease;
+  }
+  .cat-card:hover {
+    border-color: var(--gold);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 32px rgba(15,30,53,0.18);
+  }
+  .cat-card:hover::before { transform: scaleX(1); }
+  .cat-card .icon { font-size: 1.7rem; margin-bottom: 10px; }
+  .cat-card .name {
+    font-weight: 700;
+    font-size: 0.92rem;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+  .cat-card .count {
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+  .cat-card .progress-bar {
+    margin-top: 10px;
+    height: 4px;
+    background: #e5e7eb;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .cat-card .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  .btn-all {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    background: var(--navy);
+    color: var(--gold);
+    border: 2px solid var(--navy);
+    border-radius: 12px;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: all 0.22s ease;
+    margin-bottom: 12px;
+  }
+  .btn-all:hover {
+    background: var(--navy2);
+    box-shadow: 0 4px 20px rgba(15,30,53,0.3);
+    transform: translateY(-2px);
+  }
+
+  .btn-review {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    background: transparent;
+    color: var(--navy);
+    border: 2px solid var(--navy);
+    border-radius: 12px;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.22s ease;
+  }
+  .btn-review:hover {
+    background: var(--navy);
+    color: var(--gold);
+  }
+
+  /* ===== QUIZ ===== */
+  #quiz {
+    max-width: 740px;
+    margin: 0 auto;
+    padding: 36px 24px 80px;
+  }
+
+  .quiz-header {
+    margin-bottom: 28px;
+  }
+  .quiz-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .cat-tag {
+    background: var(--navy);
+    color: var(--gold);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.06em;
+  }
+  .q-counter {
+    color: var(--muted);
+    font-size: 0.83rem;
+  }
+  .progress-track {
+    height: 6px;
+    background: #e5e7eb;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .progress-fill-quiz {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+
+  .question-box {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 28px 28px 24px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+  }
+  .question-text {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.08rem;
+    line-height: 1.9;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+
+  .choices {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .choice-btn {
+    background: var(--cream);
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 14px 18px;
+    text-align: left;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 0.92rem;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .choice-btn .choice-label {
+    min-width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: all 0.18s;
+  }
+  .choice-btn:hover:not(:disabled) {
+    border-color: var(--gold);
+    background: #fffbf0;
+  }
+  .choice-btn:hover:not(:disabled) .choice-label {
+    background: var(--gold);
+    color: white;
+  }
+  .choice-btn.correct {
+    border-color: var(--correct);
+    background: var(--correct-bg);
+    color: var(--correct);
+  }
+  .choice-btn.correct .choice-label {
+    background: var(--correct);
+    color: white;
+  }
+  .choice-btn.wrong {
+    border-color: var(--wrong);
+    background: var(--wrong-bg);
+    color: var(--wrong);
+  }
+  .choice-btn.wrong .choice-label {
+    background: var(--wrong);
+    color: white;
+  }
+  .choice-btn:disabled { cursor: default; }
+
+  .feedback-box {
+    background: var(--white);
+    border-radius: 14px;
+    padding: 20px 24px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+    display: none;
+    border-left: 5px solid var(--correct);
+  }
+  .feedback-box.wrong { border-left-color: var(--wrong); }
+  .feedback-box .fb-title {
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 8px;
+  }
+  .feedback-box.correct .fb-title { color: var(--correct); }
+  .feedback-box.wrong .fb-title { color: var(--wrong); }
+  .feedback-box .fb-body {
+    font-size: 0.88rem;
+    line-height: 1.8;
+    color: var(--text);
+  }
+  .feedback-box .fb-point {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #e5e7eb;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+
+  .btn-next {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    background: var(--navy);
+    color: var(--gold);
+    border: none;
+    border-radius: 12px;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: none;
+  }
+  .btn-next:hover {
+    background: var(--navy2);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(15,30,53,0.25);
+  }
+
+  /* ===== RESULT ===== */
+  #result {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 60px 24px 80px;
+    text-align: center;
+  }
+  .result-circle {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: var(--navy);
+    margin: 0 auto 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 40px rgba(15,30,53,0.3);
+  }
+  .result-score {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 2.8rem;
+    color: var(--gold);
+    font-weight: 700;
+    line-height: 1;
+  }
+  .result-of { color: rgba(255,255,255,0.6); font-size: 0.8rem; margin-top: 4px; }
+
+  .result-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.5rem;
+    color: var(--navy);
+    margin-bottom: 10px;
+  }
+  .result-msg {
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.8;
+    margin-bottom: 32px;
+  }
+
+  .result-breakdown {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 20px 24px;
+    box-shadow: var(--shadow);
+    margin-bottom: 24px;
+    text-align: left;
+  }
+  .breakdown-title {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--navy);
+    margin-bottom: 14px;
+    text-align: center;
+    letter-spacing: 0.05em;
+  }
+  .breakdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-size: 0.84rem;
+  }
+  .breakdown-item .bi-label { flex: 1; color: var(--text); }
+  .breakdown-item .bi-val { font-weight: 700; color: var(--navy); min-width: 50px; text-align: right; }
+  .breakdown-item .bi-bar {
+    flex: 2;
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .bi-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    border-radius: 4px;
+  }
+
+  .result-btns { display: flex; flex-direction: column; gap: 10px; }
+
+  /* ===== SCENARIO BOX (ケース型) ===== */
+  .scenario-box {
+    background: #f0f4ff;
+    border: 1px solid #c7d4f5;
+    border-left: 4px solid #4a6cf7;
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 16px;
+    font-size: 0.88rem;
+    line-height: 1.9;
+    color: #1e2a4a;
+  }
+  .scenario-box .sc-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #4a6cf7;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* 計算問題ヒント */
+  .calc-hint {
+    background: #fff8e8;
+    border: 1px solid #f0d070;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.82rem;
+    color: #7a5a00;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* 問題タイプバッジ */
+  .type-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.06em;
+  }
+  .type-badge.case  { background: #e8ecff; color: #4a6cf7; }
+  .type-badge.calc  { background: #fff3cc; color: #9a6700; }
+  .type-badge.law   { background: #ffe8f0; color: #c0184a; }
+  .type-badge.basic { background: #e8f5e9; color: #2e7d32; }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 480px) {
+    .hero h1 { font-size: 1.4rem; }
+    .category-grid { grid-template-columns: 1fr 1fr; }
+    .question-text { font-size: 0.97rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">📋 BM検定 学習アプリ</div>
+    <div class="sub">BUSINESS MANAGER CERTIFICATION</div>
+  </div>
+  <div class="spacer"></div>
+  <div class="score-badge" id="scoreBadge">📊 総合スコア: --</div>
+</header>
+
+<!-- ===== HOME ===== -->
+<div id="home" class="screen active">
+  <div class="hero">
+    <h1>ビジネスマネージャー検定<br><span>合格への道</span></h1>
+    <p>カテゴリ別に学んで、実力を確認しよう。<br>間違えた問題は復習モードで徹底的に克服！</p>
+  </div>
+
+  <p class="section-title">カテゴリを選んで学習する</p>
+  <div class="category-grid" id="categoryGrid"></div>
+
+  <button class="btn-all" onclick="startQuiz('all')">🎯 全カテゴリ混合チャレンジ</button>
+  <button class="btn-review" id="btnReview" onclick="startQuiz('review')" style="display:none">🔁 間違えた問題だけ復習する (<span id="reviewCount">0</span>問)</button>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div id="quiz" class="screen">
+  <div class="quiz-header">
+    <div class="quiz-meta">
+      <span class="cat-tag" id="catTag"></span>
+      <span class="type-badge" id="typeBadge" style="display:none"></span>
+      <span class="q-counter" id="qCounter"></span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill-quiz" id="quizProgress" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="question-box">
+    <div id="scenarioBox" class="scenario-box" style="display:none">
+      <div class="sc-label">📋 シナリオ</div>
+      <div id="scenarioText"></div>
+    </div>
+    <div id="calcHint" class="calc-hint" style="display:none">🧮 <span id="calcHintText"></span></div>
+    <div class="question-text" id="questionText"></div>
+  </div>
+
+  <div class="choices" id="choices"></div>
+
+  <div class="feedback-box" id="feedbackBox">
+    <div class="fb-title" id="fbTitle"></div>
+    <div class="fb-body" id="fbBody"></div>
+    <div class="fb-point" id="fbPoint"></div>
+  </div>
+
+  <button class="btn-next" id="btnNext" onclick="nextQuestion()"></button>
+</div>
+
+<!-- ===== RESULT ===== -->
+<div id="result" class="screen">
+  <div class="result-circle">
+    <div class="result-score" id="resScore"></div>
+    <div class="result-of" id="resOf"></div>
+  </div>
+  <div class="result-title" id="resTitle"></div>
+  <div class="result-msg" id="resMsg"></div>
+  <div class="result-breakdown" id="resBreakdown"></div>
+  <div class="result-btns">
+    <button class="btn-all" onclick="goHome()">🏠 ホームに戻る</button>
+    <button class="btn-review" id="btnResultReview" onclick="startQuiz('review')" style="display:none">🔁 間違えた問題を復習する</button>
+  </div>
+</div>
+
+<script>
+// =====================================================================
+//  問題データベース
+// =====================================================================
+const QUESTIONS = [
+  // ── マネジメントの基本 ──
+  { id:1, cat:"マネジメントの基本",
+    q:"PDCAサイクルの「C」が表すものはどれか。",
+    choices:["計画（Plan）","実行（Do）","評価・確認（Check）","改善（Action）"],
+    ans:2, exp:"PDCAはPlan（計画）→Do（実行）→Check（評価）→Action（改善）の順。Cは評価・確認フェーズで、実行結果を目標と照合します。" },
+
+  { id:2, cat:"マネジメントの基本",
+    q:"マズローの欲求5段階説において、最も高次の欲求はどれか。",
+    choices:["安全の欲求","承認（尊重）の欲求","社会的欲求","自己実現の欲求"],
+    ans:3, exp:"マズローは欲求を①生理的→②安全→③社会的（所属・愛情）→④承認→⑤自己実現の順で階層化。自己実現が最も高次です。" },
+
+  { id:3, cat:"マネジメントの基本",
+    q:"マネジメントにおける「スパン・オブ・コントロール」とは何を指すか。",
+    choices:["管理者が直接管理できる部下の人数","プロジェクトの期間","権限委譲の範囲","意思決定の速さ"],
+    ans:0, exp:"スパン・オブ・コントロール（管理の幅）とは、1人の管理者が直接・効率的に管理できる部下の最大人数のこと。組織設計の重要な概念です。" },
+
+  { id:4, cat:"マネジメントの基本",
+    q:"目標による管理（MBO）を提唱したのは誰か。",
+    choices:["フレデリック・テイラー","ピーター・ドラッカー","ヘンリー・フェイヨール","ダグラス・マクレガー"],
+    ans:1, exp:"MBO（Management by Objectives）はドラッカーが1954年著書『現代の経営』で提唱。上司と部下が共同で目標を設定し、達成度で評価します。" },
+
+  { id:5, cat:"マネジメントの基本",
+    q:"OJT（On-the-Job Training）の説明として正しいものはどれか。",
+    choices:["外部研修機関での座学中心の研修","職場外でのロールプレイング研修","eラーニングによる自己学習","実際の業務を通じて行う職場内訓練"],
+    ans:3, exp:"OJTは職場内で実際の業務を通じて上司・先輩が指導する育成手法。即戦力化に適しており、Off-JT（職場外研修）と組み合わせて活用します。" },
+
+  // ── 人材育成・労務管理 ──
+  { id:6, cat:"人材育成・労務管理",
+    q:"フィードバックの「SBI」フレームワークのSが指すものはどれか。",
+    choices:["スキル（Skill）","成果（Success）","スコープ（Scope）","状況（Situation）"],
+    ans:3, exp:"SBIはSituation（状況）・Behavior（行動）・Impact（影響）の頭文字。具体的な状況を示しながら行動とその影響を伝える効果的なフィードバック手法です。" },
+
+  { id:7, cat:"人材育成・労務管理",
+    q:"労働基準法上、法定労働時間の原則はどれか。",
+    choices:["1日7時間、1週40時間","1日8時間、1週40時間","1日8時間、1週44時間","1日9時間、1週45時間"],
+    ans:1, exp:"労働基準法第32条により、法定労働時間は1日8時間・1週40時間が原則。これを超える場合は36協定（時間外労働協定）の締結が必要です。" },
+
+  { id:8, cat:"人材育成・労務管理",
+    q:"コーチングで重視される傾聴スキルの説明として最も適切なものはどれか。",
+    choices:["相手の話を最後まで聞き、感情も含めて理解する","相手の話を遮ってアドバイスを伝える","自分の経験を中心に話す","問題点を即座に指摘する"],
+    ans:0, exp:"傾聴（アクティブ・リスニング）は相手の言葉・感情・意図を深く理解すること。コーチングでは質問と傾聴を組み合わせて相手の自発的な気づきを促します。" },
+
+  { id:9, cat:"人材育成・労務管理",
+    q:"ハラスメント防止の観点から、パワーハラスメントの要件に含まれないものはどれか。",
+    choices:["優越的な関係を背景にした言動","業務上必要かつ相当な範囲を超えた言動","労働者の就業環境が害されること","上司への反論・意見表明"],
+    ans:3, exp:"パワハラの3要件は①優越的関係を背景とした言動②業務上の適正範囲を超えた言動③就業環境を害すること（厚生労働省指針）。上司への正当な意見表明は該当しません。" },
+
+  { id:10, cat:"人材育成・労務管理",
+    q:"コンピテンシーとは何か。最も適切な説明を選べ。",
+    choices:["高業績者が示す行動特性・能力","業務上の資格・免許","学歴・職歴などの経歴","仕事の成果物・アウトプット"],
+    ans:0, exp:"コンピテンシーとは高業績者に共通して見られる行動特性や思考パターン。単なるスキルや知識ではなく、成果に結びつく行動レベルの特性を指します。" },
+
+  // ── 業務管理・組織運営 ──
+  { id:11, cat:"業務管理・組織運営",
+    q:"ロジカルシンキングの「MECE」とはどういう意味か。",
+    choices:["漏れなく・ダブりなく","素早く・確実に","測定可能・達成可能","明確に・簡潔に"],
+    ans:0, exp:"MECEはMutually Exclusive, Collectively Exhaustiveの略で「相互に排他的で、全体として網羅的」を意味します。問題分析や情報整理の際の基本原則です。" },
+
+  { id:12, cat:"業務管理・組織運営",
+    q:"SMART目標設定のMが表す要素はどれか。",
+    choices:["やる気がある（Motivated）","管理しやすい（Manageable）","意味ある（Meaningful）","測定可能（Measurable）"],
+    ans:3, exp:"SMARTはSpecific（具体的）・Measurable（測定可能）・Achievable（達成可能）・Relevant（関連性）・Time-bound（期限付き）の略。目標を明確化するフレームワークです。" },
+
+  { id:13, cat:"業務管理・組織運営",
+    q:"報告・連絡・相談（ほうれんそう）において、「報告」の基本として正しいものはどれか。",
+    choices:["結論より先に経緯を詳しく説明する","進捗が良い時だけ行う","同僚間で情報を共有することを指す","指示を出した上司に対して行う"],
+    ans:3, exp:"報告は指示・命令を出した上司（指示者）に対して行うのが原則。結論を先に述べ、次に経緯や根拠を伝えます。悪い情報ほど早期に報告することが重要です。" },
+
+  { id:14, cat:"業務管理・組織運営",
+    q:"会議のファシリテーターの役割として最も適切なものはどれか。",
+    choices:["自分の意見を積極的に主張する","会議の結論を自分で決定する","議事録を一人で作成する","議論を整理し、参加者の発言を引き出す"],
+    ans:3, exp:"ファシリテーターは「促進者」として中立的立場を保ちながら、議論を整理・可視化し、全員が参加できるよう場を整えます。自分の意見の主張は役割外です。" },
+
+  { id:15, cat:"業務管理・組織運営",
+    q:"「デリゲーション（権限委譲）」を行う際の注意点として正しいものはどれか。",
+    choices:["結果の最終責任は委譲者（管理者）が持つ","責任もすべて委譲先に移転する","細かい進捗管理は不要になる","権限委譲は書面でのみ行う"],
+    ans:0, exp:"権限委譲は業務遂行の権限を部下に渡すものですが、最終的な結果責任はマネージャーが負い続けます。適切なフォローアップとサポートが不可欠です。" },
+
+  // ── コンプライアンス・リスク管理 ──
+  { id:16, cat:"コンプライアンス・リスク管理",
+    q:"コンプライアンスとは何を意味するか、最も広義の説明を選べ。",
+    choices:["法律・条例の遵守のみ","社内規程への準拠","税務申告の適正実施","法律・規則・社会規範・倫理などに従った行動"],
+    ans:3, exp:"コンプライアンスは「法令遵守」と訳されますが、実際には法律だけでなく社内規程・社会規範・倫理観・ステークホルダーへの期待への対応を含む広い概念です。" },
+
+  { id:17, cat:"コンプライアンス・リスク管理",
+    q:"リスクマネジメントの基本的なプロセスの順序として正しいものはどれか。",
+    choices:["リスク対応→リスク特定→リスク評価→モニタリング","リスク評価→リスク特定→モニタリング→リスク対応","モニタリング→リスク特定→リスク対応→リスク評価","リスク特定→リスク評価→リスク対応→モニタリング"],
+    ans:3, exp:"リスクマネジメントは①特定（何がリスクか）→②評価（重大性・発生確率）→③対応（回避・低減・移転・受容）→④モニタリングの流れで行います。" },
+
+  { id:18, cat:"コンプライアンス・リスク管理",
+    q:"内部通報制度（公益通報者保護法）に関する説明として正しいものはどれか。",
+    choices:["通報を理由とした解雇・不利益取扱いは禁止される","通報者は匿名でなければ保護されない","競合他社への通報が最も推奨される","通報できる対象は刑事事件のみ"],
+    ans:0, exp:"公益通報者保護法により、不正行為を通報した労働者への解雇・降格などの不利益取扱いは禁止されます。2022年改正で事業者の体制整備義務も強化されました。" },
+
+  { id:19, cat:"コンプライアンス・リスク管理",
+    q:"個人情報保護法における「要配慮個人情報」に含まれないものはどれか。",
+    choices:["病歴","犯罪歴","氏名・住所","人種・民族"],
+    ans:2, exp:"要配慮個人情報は差別・不当な取扱いを防ぐため特別に保護される情報で、病歴・犯罪歴・障害情報・人種・信条等が含まれます。氏名・住所は通常の個人情報です。" },
+
+  { id:20, cat:"コンプライアンス・リスク管理",
+    q:"BCP（Business Continuity Plan）とは何か。",
+    choices:["年間の事業計画書","社員のキャリア開発計画","コスト削減のための業務改善計画","緊急時・災害時に事業を継続・早期復旧するための計画"],
+    ans:3, exp:"BCPは事業継続計画のこと。地震・感染症・システム障害などの緊急時でも重要業務を継続・早期復旧できるよう、手順・体制・資源を事前に定めた計画です。" },
+
+  // ── マーケティング ──
+  { id:21, cat:"マーケティング",
+    q:"STP分析の「T」が表すものはどれか。",
+    choices:["テスト（Testing）","トレンド（Trend）","転換（Transformation）","ターゲティング（Targeting）"],
+    ans:3, exp:"STPはSegmentation（市場細分化）・Targeting（標的市場の選定）・Positioning（ポジショニング）の3ステップ。どの顧客層に、どういう価値で訴求するかを決定します。" },
+
+  { id:22, cat:"マーケティング",
+    q:"4P分析のうち「Place（流通）」に含まれる意思決定として適切なものはどれか。",
+    choices:["商品の価格設定","販売チャネル・流通経路の選択","広告の媒体選定","製品のデザイン決定"],
+    ans:1, exp:"マーケティングミックス4PはProduct・Price・Place・Promotionで構成。Placeは顧客に製品を届ける流通経路（チャネル）の選択・管理に関する意思決定です。" },
+
+  { id:23, cat:"マーケティング",
+    q:"NPS（Net Promoter Score）が測定するものとして正しいものはどれか。",
+    choices:["従業員の満足度","顧客の購買頻度","顧客ロイヤルティ（推奨意向）","市場シェア"],
+    ans:2, exp:"NPSは「この製品・サービスを友人や同僚に勧めますか？」という1問で顧客ロイヤルティを測定する指標。推奨者－批判者の比率で算出します。" },
+
+  // ── 財務・数値管理 ──
+  { id:24, cat:"財務・数値管理",
+    q:"損益計算書（PL）において「売上総利益」の計算式として正しいものはどれか。",
+    choices:["売上高 − 売上原価","売上高 − 販売費及び一般管理費","売上高 − 営業外費用","売上高 − 当期純利益"],
+    ans:0, exp:"売上総利益（粗利）＝売上高−売上原価。ここから販管費を差し引いたものが営業利益、さらに営業外損益を加減したものが経常利益です。" },
+
+  { id:25, cat:"財務・数値管理",
+    q:"KPI（Key Performance Indicator）の説明として最も適切なものはどれか。",
+    choices:["事業戦略の最終目標","原価計算の一手法","目標達成度を測る重要業績評価指標","財務諸表の分析手法"],
+    ans:2, exp:"KPIは目標（KGI）に至るプロセスを評価する指標。売上・顧客数・リードタイムなど定量的に測定可能なものを設定し、進捗をモニタリングします。" },
+
+  { id:26, cat:"財務・数値管理",
+    q:"予算管理において「予実差異分析」の目的として正しいものはどれか。",
+    choices:["計画（予算）と実績の差異原因を特定し、改善アクションに繋げること","予算を増額・修正すること","競合他社の業績と比較すること","過去の実績データを保管すること"],
+    ans:0, exp:"予実差異分析は予算と実績の差異（乖離）をカテゴリ・要因別に分解し、原因を特定して経営判断・改善行動に活かすプロセス管理の中心的手法です。" },
+
+  // ── リーダーシップ ──
+  { id:27, cat:"リーダーシップ",
+    q:"SL理論（状況対応型リーダーシップ）で用いられる部下の「成熟度」を構成する2つの要素はどれか。",
+    choices:["年齢と勤続年数","知識と経験","意欲と能力","学歴と資格"],
+    ans:2, exp:"ハーシーとブランチャードのSL理論では、部下の成熟度を「能力（スキル・知識）」と「意欲（モチベーション・自信）」の2軸で評価し、最適なリーダーシップスタイルを選択します。" },
+
+  { id:28, cat:"リーダーシップ",
+    q:"アサーティブコミュニケーションとはどのようなコミュニケーションスタイルか。",
+    choices:["相手に強く主張し、自分の意見を通す","相手の意見に常に同調する","自分も相手も尊重しながら率直に意見を伝える","感情を抑えた事実のみの報告"],
+    ans:2, exp:"アサーティブとは自己も他者も尊重した上で、率直・誠実・対等に意見を伝えるスタイル。攻撃的（Aggressive）・受動的（Passive）と対比される第3の選択肢です。" },
+
+  { id:29, cat:"リーダーシップ",
+    q:"心理的安全性（Psychological Safety）の職場への効果として最も正確なものはどれか。",
+    choices:["失敗を容認するため成果が下がる","上司への批判が増加する","個人作業の効率が上がる","メンバーが罰を恐れずに発言・挑戦でき、チームの学習と成果が高まる"],
+    ans:3, exp:"心理的安全性はGoogleのプロジェクト・アリストテレスで高業績チームの最重要要素と判明。罰せられる不安なく意見・疑問・失敗を共有できる環境が学習・イノベーションを促進します。" },
+
+  { id:30, cat:"リーダーシップ",
+    q:"1 on 1ミーティングの主な目的として最も適切なものはどれか。",
+    choices:["業務の進捗を管理者が確認するための報告会","複数メンバーへの一斉情報共有","目標設定のみを行う年1回の面談","部下の成長・ウェルビーイング支援を中心とした対話"],
+    ans:3, exp:"1on1は部下を主役とした対話の場。信頼関係の構築・部下の課題解決支援・動機づけ・成長支援が主目的。上司の確認・報告の場ではなく、部下が話す比率を高くするのが重要です。" },
+
+  // ── 損益分岐点・財務計算 ──
+  { id:31, cat:"損益分岐点・財務計算", type:"calc",
+    calcHint:"損益分岐点売上高 ＝ 固定費 ÷（1 − 変動費率）",
+    q:"固定費が月200万円、変動費率が60%の事業の損益分岐点売上高はいくらか。",
+    choices:["300万円","400万円","500万円","600万円"],
+    ans:2, exp:"損益分岐点売上高 ＝ 200万 ÷（1−0.6）＝ 200万 ÷ 0.4 ＝ 500万円。この売上高で利益がゼロになります。" },
+
+  { id:32, cat:"損益分岐点・財務計算", type:"calc",
+    calcHint:"変動費率 ＝ 変動費 ÷ 売上高　／　限界利益率 ＝ 1 − 変動費率",
+    q:"売上高1,000万円、変動費700万円の場合、限界利益率はいくらか。",
+    choices:["30%","40%","70%","60%"],
+    ans:0, exp:"変動費率 ＝ 700÷1,000 ＝ 70%。限界利益率 ＝ 1−0.7 ＝ 30%。限界利益は売上高から変動費を引いた額で、固定費回収と利益創出の源泉です。" },
+
+  { id:33, cat:"損益分岐点・財務計算", type:"calc",
+    calcHint:"目標利益達成売上高 ＝（固定費 ＋ 目標利益）÷ 限界利益率",
+    q:"固定費300万円、限界利益率40%のとき、目標利益100万円を達成するために必要な売上高はいくらか。",
+    choices:["750万円","850万円","1,000万円","1,100万円"],
+    ans:2, exp:"（300＋100）÷0.4 ＝ 400÷0.4 ＝ 1,000万円。損益分岐点分析は目標売上の逆算にも使えます。" },
+
+  { id:34, cat:"損益分岐点・財務計算", type:"calc",
+    calcHint:"安全余裕率（%）＝（実際売上高 − 損益分岐点売上高）÷ 実際売上高 × 100",
+    q:"実際売上高が800万円、損益分岐点売上高が600万円のとき、安全余裕率はいくらか。",
+    choices:["20%","25%","30%","75%"],
+    ans:1, exp:"安全余裕率 ＝（800−600）÷800 × 100 ＝ 25%。売上が何%減少しても損失にならないかを示す指標。高いほど経営の安全性が高いといえます。" },
+
+  // ── 労務管理（法令数値） ──
+  { id:35, cat:"労務管理（法令数値）", type:"law",
+    q:"労働基準法上、入社日から6ヶ月間継続勤務し全労働日の8割以上出勤した労働者に付与される年次有給休暇の日数はいくらか。",
+    choices:["5日","8日","10日","12日"],
+    ans:2, exp:"労基法第39条により、6ヶ月継続勤務・8割以上出勤で10日の年次有給休暇が発生。以後は勤続年数に応じて最大20日まで増加します（1年半で11日、2年半で12日…）。" },
+
+  { id:36, cat:"労務管理（法令数値）", type:"law",
+    q:"年次有給休暇の年5日時季指定義務について、正しい説明はどれか。",
+    choices:["全ての労働者に義務がある","年10日以上の有給が発生する労働者が対象","管理職には適用されない","労働者が自ら申請した場合のみ対象"],
+    ans:1, exp:"2019年施行の改正労基法により、年10日以上の有給休暇が発生する労働者に対し、使用者は年5日は確実に取得させる義務があります。管理職も対象です。" },
+
+  { id:37, cat:"労務管理（法令数値）", type:"law",
+    q:"36協定（時間外・休日労働に関する協定）における、特別条項なしの時間外労働の上限として正しいものはどれか。",
+    choices:["月30時間・年250時間","月60時間・年500時間","月45時間・年360時間","月80時間・年720時間"],
+    ans:2, exp:"2019年施行の改正労基法により、時間外労働の上限は原則「月45時間・年360時間」が法定されました。特別条項がある場合でも年720時間・複数月平均80時間が上限です。" },
+
+  { id:38, cat:"労務管理（法令数値）", type:"law",
+    q:"育児・介護休業法における育児休業について、取得可能期間として正しいものはどれか（原則）。",
+    choices:["子が1歳6ヶ月になるまで","子が2歳になるまで","子が3歳になるまで","子が1歳になるまで"],
+    ans:3, exp:"育児休業は原則として子が1歳になるまで取得可能。保育所に入れない等の事情がある場合は最長2歳まで延長できます。2022年改正で男性の産後パパ育休も新設されました。" },
+
+  { id:39, cat:"労務管理（法令数値）", type:"law",
+    q:"同一労働同一賃金の原則について、正しい説明はどれか。",
+    choices:["正社員と非正規社員の賃金を完全に同一にする義務","残業代についてのみ適用される","職務内容・責任・配置転換の範囲が同じなら不合理な待遇差を設けてはならない","中小企業には適用されない"],
+    ans:2, exp:"同一労働同一賃金は職務内容・責任・配置転換の範囲が同じ場合の不合理な待遇差を禁止する原則。基本給・賞与・各種手当・福利厚生が対象です。完全同一化ではなく「不合理な差の禁止」が趣旨です。" },
+
+  // ── 戦略フレームワーク ──
+  { id:40, cat:"戦略フレームワーク",
+    q:"SWOT分析において「O（Opportunity：機会）」に分類されるものはどれか。",
+    choices:["自社の高い技術力","競合他社の価格競争力","少子化による市場縮小","規制緩和による新市場の出現"],
+    ans:3, exp:"SWOT分析のO（機会）は外部環境の好ましい変化。規制緩和・技術革新・人口動態の変化（追い風）などが該当。S・W（強み・弱み）は内部要因、O・T（機会・脅威）は外部要因です。" },
+
+  { id:41, cat:"戦略フレームワーク",
+    q:"ポーター（Porter）が提唱した競争優位を確立する「3つの基本戦略」に含まれないものはどれか。",
+    choices:["コストリーダーシップ戦略","差別化戦略","集中戦略","多角化戦略"],
+    ans:3, exp:"ポーターの3基本戦略は①コストリーダーシップ②差別化③集中。多角化はアンゾフの成長マトリクスの概念であり、ポーターの基本戦略には含まれません。" },
+
+  { id:42, cat:"戦略フレームワーク",
+    q:"アンゾフの成長マトリクスにおいて「既存製品×新規市場」の戦略を何というか。",
+    choices:["市場浸透","製品開発","市場開拓","多角化"],
+    ans:2, exp:"アンゾフの成長マトリクス：①既存製品×既存市場＝市場浸透 ②新製品×既存市場＝製品開発 ③既存製品×新規市場＝市場開拓 ④新製品×新規市場＝多角化。リスクは④が最大です。" },
+
+  { id:43, cat:"戦略フレームワーク",
+    q:"ポーターの「バリューチェーン（価値連鎖）」における「主活動」に含まれないものはどれか。",
+    choices:["購買物流（Inbound Logistics）","製造（オペレーション）","販売・マーケティング","人事・労務管理"],
+    ans:3, exp:"バリューチェーンの主活動は①購買物流（Inbound Logistics）②製造③出荷物流④販売・マーケティング⑤サービスの5つ。人事・労務管理・技術開発・調達活動は「支援活動」に分類されます。" },
+
+  // ── 多様性・働き方改革 ──
+  { id:44, cat:"多様性・働き方改革",
+    q:"「ダイバーシティ（多様性）」と「インクルージョン（包括）」の関係として最も適切なものはどれか。",
+    choices:["同一の概念で区別は不要","ダイバーシティは多様な人材の存在、インクルージョンはその人材が活躍できる環境づくり","インクルージョンは採用戦略、ダイバーシティは組織文化","両者とも主に性別格差の解消を指す"],
+    ans:1, exp:"ダイバーシティ（多様な人材がいること）だけでは不十分で、インクルージョン（誰もが貢献・活躍できる環境・文化）が伴って初めて組織の強みになります。D&Iと略されることが多いです。" },
+
+  { id:45, cat:"多様性・働き方改革",
+    q:"テレワーク（在宅勤務）導入時のマネージャーの対応として最も適切なものはどれか。",
+    choices:["労働時間の把握義務がなくなるため管理を緩める","成果・アウトプットで評価する仕組みと、コミュニケーション機会を意図的に設計する","チームの公平性のため全員一律の目標にする","在宅勤務者はOJTの対象外とする"],
+    ans:1, exp:"テレワーク下ではプロセスが見えにくいため、成果・アウトプット型の評価設計と、1on1等の意図的なコミュニケーション設計が重要。労働時間把握義務はテレワーク中も存続します。" },
+
+  { id:46, cat:"多様性・働き方改革",
+    q:"「アンコンシャスバイアス（無意識の偏見）」がマネジメントに与える悪影響として最も適切なものはどれか。",
+    choices:["意思決定が速くなる","評価の公平性が損なわれ、特定の属性の人材が不当に評価される","チームの生産性が一時的に上がる","コンプライアンスリスクが減少する"],
+    ans:1, exp:"アンコンシャスバイアスは無意識の先入観。「女性は管理職に向かない」「若手の意見は重要でない」等の思い込みが人事評価・登用の公平性を損ない、多様な人材の活躍を阻害します。" },
+
+  // ── ケース型問題 ──
+  { id:47, cat:"ケース型問題", type:"case",
+    scenario:"田中マネージャーは、入社2年目の山田さんの最近の業績低下に気づいた。以前は積極的に発言していたが、ここ1ヶ月は会議でも沈黙が多く、提出物の締め切りも守れていない。同僚から「山田さんが最近元気ない」という声もある。",
+    q:"田中マネージャーがまず取るべき行動として最も適切なものはどれか。",
+    choices:["全体会議で業績改善を促す","1on1の場を設け、山田さんが安心して話せる環境で状況を傾聴する","即座に業務量を増やして奮起させる","人事部に異動を相談する"],
+    ans:1, exp:"業績低下の背景には職場の人間関係・健康問題・キャリア不安など様々な原因が考えられます。まず安心して話せる1on1の場で傾聴し、本人の言葉で状況を把握することが第一歩。原因を確認せずに対処すると状況を悪化させる可能性があります。" },
+
+  { id:48, cat:"ケース型問題", type:"case",
+    scenario:"製造部門のマネージャー、鈴木さんは部下10名を管理している。今月、チームの残業時間の合計が先月比150%に増加した。36協定の上限（月45時間）に近づいているメンバーが3名おり、来月も繁忙期が続く見込みだ。",
+    q:"鈴木マネージャーがとるべき対応の優先順位として最も適切なものはどれか。",
+    choices:["来月の特別条項適用を人事部に申請し、上限を引き上げて乗り切る","まず業務の見直しと役割分担の最適化を行い、必要に応じて応援要請や優先度調整を行う","全員に月60時間まで残業してもらうよう指示する","繁忙期なので今月は報告せず様子を見る"],
+    ans:1, exp:"36協定上限への接近は法令違反リスク。まず業務量・分担・優先度を見直し（業務削減・効率化）、それでも不足なら上司・他部門への応援要請を検討します。特別条項は正当な理由がある場合の最終手段であり、「繁忙期だから」だけでは不十分。報告を怠ることは論外です。" },
+
+  { id:49, cat:"ケース型問題", type:"case",
+    scenario:"佐藤チームリーダーは、部下の松本さんから「自分はこの仕事が向いていないと思う。転職も考えている」と1on1で打ち明けられた。松本さんは入社3年目で技術力は高いが、最近アサインされたプロジェクトで思うような成果が出ていない。",
+    q:"佐藤リーダーの対応として最も適切なものはどれか。",
+    choices:["「気持ちはわかるけど、今は会社を辞めないで」と引き止める","人事部に相談して異動を手配する","今の悩みの背景を深く傾聴し、キャリアビジョンや現状の課題について一緒に整理する","成果が出ていないことを率直に指摘し、改善計画を提示する"],
+    ans:2, exp:"まず傾聴が重要。「向いていない」という言葉の背後には、スキルのミスマッチ・職場環境・承認欲求の未充足などがある場合があります。本人のキャリアビジョンを引き出しながら、現状の課題を一緒に整理することで、「辞める」以外の選択肢が見えることがあります。引き止めから入るのは本人の気持ちを否定することになります。" },
+
+  { id:50, cat:"ケース型問題", type:"case",
+    scenario:"営業部のマネージャー、伊藤さんのチームは今月の売上が予算の70%にとどまった。月末の報告会で経営陣への説明が必要だ。主な原因として①主要顧客の購買停止（先方の社内事情）②競合の値下げ攻勢 が判明している。",
+    q:"伊藤マネージャーが経営陣への報告で最初に伝えるべき内容として最も適切なものはどれか。",
+    choices:["チームメンバーの努力が足りなかったことを謝罪する","競合他社の値下げを批判し、自社の価格優位性を訴える","結論（予算比70%・未達額）→主因分析→翌月以降の対策の順で報告する","来月は必ず達成すると宣言する"],
+    ans:2, exp:"ビジネス報告の基本は「結論ファースト」。①事実（予算比70%・未達額）②原因分析（内部/外部要因の切り分け）③改善策の順が適切。原因の内外を切り分けて示すことで、経営陣が適切な意思決定をしやすくなります。謝罪や宣言から入るのは報告としての質を下げます。" },
+
+  { id:51, cat:"ケース型問題", type:"case",
+    scenario:"システム開発部のマネージャー、中村さんは、部下の加藤さん（ベテラン社員）が新人の木村さんに対して「そんなこともわからないのか」「自分で考えろ」と繰り返し言っている場面を複数回目撃した。木村さんは最近元気がなく、有給を多く取得している。",
+    q:"中村マネージャーがとるべき最初の行動として最も適切なものはどれか。",
+    choices:["加藤さんを全体会議で注意する","まず木村さんの状況を1on1で確認し、その後加藤さんと個別に面談して事実確認と指導を行う","木村さんに「気にしないように」と伝える","直ちに人事部に懲戒処分を申請する"],
+    ans:1, exp:"まず被害者側（木村さん）の状況・意向を個別に確認します。次に行為者（加藤さん）と個別面談で事実確認と、その言動が与える影響についてフィードバックします。全体会議での公開注意は不適切で、双方のプライバシーを守りながら対処することが重要です。懲戒は事実確認・社内規程に基づくプロセスを踏む必要があります。" },
+
+  { id:52, cat:"ケース型問題", type:"case",
+    scenario:"新商品の企画会議に向けて、高橋マネージャーはチームでブレインストーミングを実施した。しかし、声の大きいベテラン社員Aの意見ばかりが採用され、若手メンバーが発言しにくい雰囲気になっている。",
+    q:"高橋マネージャーがチームの創造性を引き出すために取るべき行動として最も適切なものはどれか。",
+    choices:["ベテランAの発案をそのまま採用する","「批判しない」ルールの徹底、若手に先に発言機会を与えるなどファシリテーションを工夫する","次回から若手だけのミーティングにする","多数決で意見を採用する"],
+    ans:1, exp:"ブレインストーミングの鉄則は「判断・批判をしない」。心理的安全性を高めるには、若手に先に発言機会を設ける、付箋で全員が書いてから共有するなどの工夫が有効です。声の大きい人の意見が通りやすい「ハーディング効果」を防ぐのがファシリテーターの役割です。" },
+
+  { id:53, cat:"ケース型問題", type:"case",
+    scenario:"小売チェーンのエリアマネージャー、大野さんは担当エリアの業績をSWOT分析で整理した。【強み】接客品質が高い　【弱み】店舗が老朽化　【機会】地域の人口増加トレンド　【脅威】近隣に大型競合が出店予定。",
+    q:"SWOT分析をふまえた「SO戦略」（強みで機会を活かす戦略）として最も適切なものはどれか。",
+    choices:["老朽化した店舗を改装して競合に対抗する","競合出店に備えて価格を下げる","人口増加で来店客が増える中、高品質な接客でリピーター獲得・口コミ拡散を狙う","店舗の改装を延期し、コスト削減を優先する"],
+    ans:2, exp:"SO戦略は「強み（S）×機会（O）」の組み合わせ。強みである高い接客品質を活かし、人口増加（機会）で増える来店客をリピーターに変える戦略が該当します。店舗改装（弱み克服）や価格競争（脅威対応）はWO・ST戦略の発想です。" },
+
+  { id:54, cat:"ケース型問題", type:"case",
+    scenario:"ITスタートアップのプロダクトマネージャー、渡辺さんは「今期中に新機能を5つリリース」という目標を設定した。期末に振り返ると、5つリリースしたが顧客満足度は低下しており、サポートへの問い合わせも急増した。",
+    q:"この状況から渡辺さんが学ぶべき教訓として最も適切なものはどれか。",
+    choices:["来期はリリース目標を10個にすべきだ","KPI（リリース数）は達成しても、本来のKGI（顧客満足・事業成果）と紐づいていなかったことを反省し、目標設計を見直す","チームの開発スピードが遅すぎる","問い合わせ対応チームを増員する"],
+    ans:1, exp:"「リリース数」はKPI（プロセス指標）であって、KGI（顧客満足・収益）ではありません。KPIを達成しても事業目標（KGI）に繋がらなければ意味がない。目標設計では品質・顧客満足度もKPIに組み込む必要がありました。OKRやバランスト・スコアカードの考え方にも通じます。" },
+
+  // ── 動機付け理論（追加） ──
+  { id:55, cat:"人材育成・労務管理",
+    q:"ハーズバーグの二要因論において「動機付け要因（満足要因）」に分類されるものはどれか。",
+    choices:["給与・賃金","仕事の達成感・成長の機会","会社の方針・管理","職場の人間関係"],
+    ans:1, exp:"ハーズバーグは職場の要因を動機付け要因（満足→やる気向上）と衛生要因（不満足→やる気低下防止）に分類。達成感・承認・仕事自体・責任・成長が動機付け要因。給与・人間関係・労働条件は衛生要因です。" },
+
+  { id:56, cat:"マネジメントの基本",
+    q:"マクレガーのY理論の説明として正しいものはどれか。",
+    choices:["人は自律的に働き、適切な環境があれば自ら責任を負う","人は本来怠惰で、強制・命令・統制が必要","全ての人は金銭的報酬のみで動機付けられる","部下は意思決定に参加すべきでない"],
+    ans:0, exp:"マクレガーのX理論は「人は怠惰・強制が必要」、Y理論は「人は自律的で責任を進んで負う」という人間観。Y理論に基づくマネジメントは参加型・自律型で、モチベーション向上につながります。" },
+
+  { id:57, cat:"業務管理・組織運営",
+    q:"事業部制組織の特徴として最も適切なものはどれか。",
+    choices:["命令系統が1本で明快なライン組織","専門性を部門ごとに集中させ、効率的な業務遂行を重視する機能別組織","製品・地域・顧客別に独立した事業単位が利益責任を持つ組織","部門間の調整を重視したフラット組織"],
+    ans:2, exp:"事業部制は製品・地域・顧客などを軸に独立した事業単位（プロフィットセンター）を設け、各事業部が利益責任を持つ組織形態。意思決定のスピードが上がる反面、全社最適との調整が課題です。" },
+
+  { id:58, cat:"財務・数値管理",
+    q:"損益計算書（PL）における「営業利益」の計算式として正しいものはどれか。",
+    choices:["売上高 − 売上原価","売上高 − 売上原価 − 営業外費用","売上総利益 − 販売費及び一般管理費","経常利益 ＋ 特別利益 − 特別損失"],
+    ans:2, exp:"PLの5段階利益：①売上総利益（売上高−売上原価）②営業利益（売上総利益−販管費）③経常利益（営業利益±営業外損益）④税引前当期純利益（経常利益±特別損益）⑤当期純利益。営業利益は本業の儲けを示します。" },
+
+  { id:59, cat:"リーダーシップ",
+    q:"ジョハリの窓において、「自分は知っているが他者は知らない」領域を何というか。",
+    choices:["秘密の窓（隠れた自己）","開放の窓（公開された自己）","盲点の窓（気づいていない自己）","未知の窓（誰も知らない自己）"],
+    ans:0, exp:"ジョハリの窓は自己開示とフィードバックの4象限モデル。①開放（自他とも知る）②盲点（他者は知るが自分は知らない）③秘密（自分は知るが他者は知らない）④未知（誰も知らない）。自己開示でコミュニケーションが深まります。" },
+];
+
+// =====================================================================
+//  状態管理
+// =====================================================================
+let state = {
+  queue: [],
+  idx: 0,
+  score: 0,
+  wrong: new Set(), // 間違えた問題ID
+  catFilter: 'all',
+  answered: {}, // {id: bool} 正誤記録
+  catStats: {} // {カテゴリ: {total, correct}}
+};
+
+// =====================================================================
+//  カテゴリ一覧
+// =====================================================================
+const CATS = [...new Set(QUESTIONS.map(q=>q.cat))];
+const CAT_ICONS = {
+  "マネジメントの基本": "🎯",
+  "人材育成・労務管理": "👥",
+  "業務管理・組織運営": "⚙️",
+  "コンプライアンス・リスク管理": "🛡️",
+  "マーケティング": "📊",
+  "財務・数値管理": "💰",
+  "リーダーシップ": "🌟",
+  "損益分岐点・財務計算": "🧮",
+  "労務管理（法令数値）": "⚖️",
+  "戦略フレームワーク": "♟️",
+  "多様性・働き方改革": "🌈",
+  "ケース型問題": "💼"
+};
+
+// =====================================================================
+//  初期化
+// =====================================================================
+function init() {
+  // catStats初期化
+  CATS.forEach(c => {
+    const qs = QUESTIONS.filter(q=>q.cat===c);
+    state.catStats[c] = state.catStats[c] || {total: qs.length, correct: 0};
+  });
+  renderHome();
+}
+
+function renderHome() {
+  const grid = document.getElementById('categoryGrid');
+  grid.innerHTML = '';
+  CATS.forEach(cat => {
+    const qs = QUESTIONS.filter(q=>q.cat===cat);
+    const st = state.catStats[cat] || {total:qs.length, correct:0};
+    // answered in this cat
+    const answeredCount = qs.filter(q=>state.answered[q.id]!==undefined).length;
+    const pct = qs.length ? Math.round(answeredCount/qs.length*100) : 0;
+    const correctPct = answeredCount ? Math.round(st.correct/qs.length*100) : 0;
+
+    const card = document.createElement('div');
+    card.className = 'cat-card';
+    card.innerHTML = `
+      <div class="icon">${CAT_ICONS[cat]||'📌'}</div>
+      <div class="name">${cat}</div>
+      <div class="count">${qs.length}問 ／ 正解率 ${correctPct}%</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    `;
+    card.onclick = () => startQuiz(cat);
+    grid.appendChild(card);
+  });
+
+  // 復習ボタン
+  const wc = state.wrong.size;
+  document.getElementById('reviewCount').textContent = wc;
+  document.getElementById('btnReview').style.display = wc > 0 ? 'block' : 'none';
+}
+
+// =====================================================================
+//  クイズ開始
+// =====================================================================
+function startQuiz(filter) {
+  state.catFilter = filter;
+  let pool;
+  if (filter === 'all') {
+    pool = [...QUESTIONS];
+  } else if (filter === 'review') {
+    pool = QUESTIONS.filter(q => state.wrong.has(q.id));
+    if (pool.length === 0) { alert('復習問題がありません！'); return; }
+    state.wrong.clear(); // リセット
+  } else {
+    pool = QUESTIONS.filter(q => q.cat === filter);
+  }
+  // シャッフル
+  pool = pool.sort(() => Math.random()-0.5);
+  state.queue = pool;
+  state.idx = 0;
+  state.score = 0;
+  showScreen('quiz');
+  renderQuestion();
+}
+
+// =====================================================================
+//  問題描画
+// =====================================================================
+function renderQuestion() {
+  const q = state.queue[state.idx];
+  const total = state.queue.length;
+  const pct = Math.round(state.idx/total*100);
+
+  document.getElementById('catTag').textContent = CAT_ICONS[q.cat]+' '+q.cat;
+  document.getElementById('qCounter').textContent = `問${state.idx+1} / ${total}`;
+  document.getElementById('quizProgress').style.width = pct+'%';
+  document.getElementById('questionText').textContent = q.q;
+
+  // タイプバッジ
+  const badge = document.getElementById('typeBadge');
+  const typeMap = { case:'💼 ケース型', calc:'🧮 計算問題', law:'⚖️ 法令数値' };
+  if (q.type && typeMap[q.type]) {
+    badge.textContent = typeMap[q.type];
+    badge.className = 'type-badge ' + q.type;
+    badge.style.display = 'inline-flex';
+  } else {
+    badge.style.display = 'none';
+  }
+
+  // シナリオ表示（ケース型）
+  const scBox = document.getElementById('scenarioBox');
+  const scText = document.getElementById('scenarioText');
+  if (q.scenario) {
+    scText.textContent = q.scenario;
+    scBox.style.display = 'block';
+  } else {
+    scBox.style.display = 'none';
+  }
+
+  // 計算ヒント表示
+  const chint = document.getElementById('calcHint');
+  const chintTxt = document.getElementById('calcHintText');
+  if (q.calcHint) {
+    chintTxt.textContent = q.calcHint;
+    chint.style.display = 'flex';
+  } else {
+    chint.style.display = 'none';
+  }
+
+  // 選択肢
+  const choicesEl = document.getElementById('choices');
+  choicesEl.innerHTML = '';
+  const labels = ['Ａ','Ｂ','Ｃ','Ｄ'];
+  q.choices.forEach((c,i) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.innerHTML = `<span class="choice-label">${labels[i]}</span><span>${c}</span>`;
+    btn.onclick = () => answer(i, q);
+    choicesEl.appendChild(btn);
+  });
+
+  // フィードバックリセット
+  const fb = document.getElementById('feedbackBox');
+  fb.style.display = 'none';
+  fb.className = 'feedback-box';
+
+  const btnNext = document.getElementById('btnNext');
+  btnNext.style.display = 'none';
+}
+
+// =====================================================================
+//  解答処理
+// =====================================================================
+function answer(chosen, q) {
+  // 全ボタン無効化
+  document.querySelectorAll('.choice-btn').forEach((btn,i) => {
+    btn.disabled = true;
+    if (i === q.ans) btn.classList.add('correct');
+    else if (i === chosen && chosen !== q.ans) btn.classList.add('wrong');
+  });
+
+  const correct = chosen === q.ans;
+  if (correct) {
+    state.score++;
+    // catStats
+    if (!state.catStats[q.cat]) state.catStats[q.cat] = {total:0, correct:0};
+    state.catStats[q.cat].correct = (state.catStats[q.cat].correct||0) + 1;
+  } else {
+    state.wrong.add(q.id);
+  }
+  state.answered[q.id] = correct;
+
+  // フィードバック
+  const fb = document.getElementById('feedbackBox');
+  fb.style.display = 'block';
+  fb.className = 'feedback-box ' + (correct ? 'correct' : 'wrong');
+  document.getElementById('fbTitle').textContent = correct ? '✅ 正解！' : '❌ 不正解…';
+  document.getElementById('fbBody').textContent = q.exp;
+  document.getElementById('fbPoint').textContent = `正解：${['Ａ','Ｂ','Ｃ','Ｄ'][q.ans]}．${q.choices[q.ans]}`;
+
+  // 次へボタン
+  const btnNext = document.getElementById('btnNext');
+  btnNext.style.display = 'block';
+  const isLast = state.idx >= state.queue.length - 1;
+  btnNext.textContent = isLast ? '📊 結果を見る →' : '次の問題へ →';
+}
+
+// =====================================================================
+//  次へ
+// =====================================================================
+function nextQuestion() {
+  state.idx++;
+  if (state.idx >= state.queue.length) {
+    showResult();
+  } else {
+    renderQuestion();
+  }
+}
+
+// =====================================================================
+//  結果
+// =====================================================================
+function showResult() {
+  showScreen('result');
+  const total = state.queue.length;
+  const pct = Math.round(state.score/total*100);
+
+  document.getElementById('resScore').textContent = state.score;
+  document.getElementById('resOf').textContent = `/ ${total}問`;
+
+  let title, msg;
+  if (pct >= 90) { title='🏆 優秀！'; msg='ほぼ完璧な理解です。自信を持って本番に臨みましょう！'; }
+  else if (pct >= 70) { title='👍 合格ライン！'; msg='良いスコアです。苦手カテゴリを復習でさらに磤き上げましょう。'; }
+  else if (pct >= 50) { title='📚 もう一息！'; msg='基礎は身についています。間違えた問題を中心に繰り返し学習しましょう。'; }
+  else { title='💪 頑張れ！'; msg='まだまだ伸びしろがあります！復習モードで弱点を克服しましょう。'; }
+
+  document.getElementById('resTitle').textContent = title;
+  document.getElementById('resMsg').textContent = msg;
+
+  // カテゴリ別内訳
+  const bd = document.getElementById('resBreakdown');
+  const cats = [...new Set(state.queue.map(q=>q.cat))];
+  let html = '<div class="breakdown-title">カテゴリ別 正解率</div>';
+  cats.forEach(cat => {
+    const catQs = state.queue.filter(q=>q.cat===cat);
+    const catCorrect = catQs.filter(q=>state.answered[q.id]===true).length;
+    const catPct = catQs.length ? Math.round(catCorrect/catQs.length*100) : 0;
+    html += `<div class="breakdown-item">
+      <span class="bi-label">${CAT_ICONS[cat]||''} ${cat}</span>
+      <div class="bi-bar"><div class="bi-bar-fill" style="width:${catPct}%"></div></div>
+      <span class="bi-val">${catCorrect}/${catQs.length}</span>
+    </div>`;
+  });
+  bd.innerHTML = html;
+
+  const wc = state.wrong.size;
+  const btnRR = document.getElementById('btnResultReview');
+  btnRR.style.display = wc > 0 ? 'block' : 'none';
+  if (wc > 0) btnRR.textContent = `🔁 間違えた${wc}問を復習する`;
+}
+
+// =====================================================================
+//  ユーティリティ
+// =====================================================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function goHome() {
+  renderHome();
+  showScreen('home');
+}
+
+init();
+</script>
+</body>
+</html>
